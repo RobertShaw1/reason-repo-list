@@ -1,25 +1,20 @@
-// our dummy data
-let dummyRepos: array(RepoData.repo) = [|
-  {
-    stargazers_count: 27,
-    full_name: "jsdf/reason-react-hacker-news",
-    html_url: "https://github.com/jsdf/reason-react-hacker-news"
-  },
-  {
-    stargazers_count: 93,
-    full_name: "reasonml/reason-tools",
-    html_url: "https://github.com/reasonml/reason-tools"
-  }
-|];
-
 [@react.component]
 let make = () => {
   let (repoData, setRepoData) = React.useState(() => None);
 
-  let loadedReposButton =
-    <button onClick={_event => setRepoData(_prev => Some(dummyRepos))}>
-      {ReasonReact.string("Load Repos")}
-    </button>;
+  React.useEffect0(() => {
+    RepoData.fetchRepos()
+      |> Js.Promise.then_(repoData => {
+          setRepoData(_prev => Some(repoData));
+          Js.Promise.resolve();
+        })
+      |> Js.Promise.catch(err => {
+          Js.log("An error occurred: " ++ Js.String.make(err));
+          Js.Promise.resolve();
+        })
+      |> ignore;
+      None;
+    });
 
   let repoItems =
     switch (repoData) {
@@ -30,7 +25,7 @@ let make = () => {
             repos,
           ),
         )
-    | None => loadedReposButton
+    | None => React.string("Loading...")
     };
 
   <div>

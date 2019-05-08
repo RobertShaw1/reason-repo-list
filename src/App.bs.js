@@ -4,20 +4,8 @@
 var $$Array = require("bs-platform/lib/js/array.js");
 var Curry = require("bs-platform/lib/js/curry.js");
 var React = require("react");
+var RepoData$ReactHooksTemplate = require("./RepoData.bs.js");
 var RepoItem$ReactHooksTemplate = require("./RepoItem.bs.js");
-
-var dummyRepos = /* array */[
-  /* record */[
-    /* full_name */"jsdf/reason-react-hacker-news",
-    /* stargazers_count */27,
-    /* html_url */"https://github.com/jsdf/reason-react-hacker-news"
-  ],
-  /* record */[
-    /* full_name */"reasonml/reason-tools",
-    /* stargazers_count */93,
-    /* html_url */"https://github.com/reasonml/reason-tools"
-  ]
-];
 
 function App(Props) {
   var match = React.useState((function () {
@@ -25,24 +13,28 @@ function App(Props) {
         }));
   var setRepoData = match[1];
   var repoData = match[0];
-  var loadedReposButton = React.createElement("button", {
-        onClick: (function (_event) {
-            return Curry._1(setRepoData, (function (_prev) {
-                          return dummyRepos;
-                        }));
-          })
-      }, "Load Repos");
+  React.useEffect((function () {
+          RepoData$ReactHooksTemplate.fetchRepos(/* () */0).then((function (repoData) {
+                    Curry._1(setRepoData, (function (_prev) {
+                            return repoData;
+                          }));
+                    return Promise.resolve(/* () */0);
+                  })).catch((function (err) {
+                  console.log("An error occurred: " + String(err));
+                  return Promise.resolve(/* () */0);
+                }));
+          return undefined;
+        }), ([]));
   var repoItems = repoData !== undefined ? $$Array.map((function (repo) {
             return React.createElement(RepoItem$ReactHooksTemplate.make, {
                         repo: repo,
                         key: repo[/* full_name */0]
                       });
-          }), repoData) : loadedReposButton;
+          }), repoData) : "Loading...";
   return React.createElement("div", undefined, React.createElement("h1", undefined, "Reason Projects"), repoItems);
 }
 
 var make = App;
 
-exports.dummyRepos = dummyRepos;
 exports.make = make;
 /* react Not a pure module */
